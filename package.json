@@ -98,6 +98,11 @@
           "type": "string",
           "default": "http://localhost:8080",
           "description": "Default base URL used by copy and request tools."
+        },
+        "restToolkit.contextPath": {
+          "type": "string",
+          "default": "",
+          "description": "Context path prefix to strip from URLs before matching (e.g., '/api/v1')"
         }
       }
     }

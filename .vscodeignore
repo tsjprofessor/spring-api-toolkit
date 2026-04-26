@@ -1,0 +1,12 @@
+.git/**
+.github/**
+.claude/**
+.vscode/**
+docs/**
+src/**
+tests/**
+node_modules/**
+tsconfig.json
+jest.config.js
+**/*.map
+**/*.ts

@@ -2,7 +2,7 @@
   "name": "spring-api-toolkit",
   "displayName": "Spring API Toolkit",
   "description": "Jump to Spring MVC endpoint methods by URL in VSCode/Qoder.",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "publisher": "tsjprofessor",
   "license": "MIT",
   "icon": "media/icon.png",

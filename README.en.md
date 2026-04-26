@@ -99,18 +99,14 @@ npm run build
   - `Ctrl+Alt+N`
 
 > **Note for macOS users with Chinese Input Method (IME):**
-> `Cmd+\` may not work when a Chinese IME is active, because the IME intercepts the `\` key at the OS level. Workarounds:
-> 1. Use the alternate shortcut `Cmd+Alt+N`.
-> 2. Set `"keyboard.dispatch": "keyCode"` in your VS Code settings (`Cmd+Shift+P` > `Preferences: Open User Settings (JSON)`), then restart VS Code.
+> `Cmd+\` may not work when a Chinese IME is active, because the IME intercepts the `\` key at the OS level.
+> Please use the alternate shortcut `Cmd+Alt+N` instead.
 
 ## Known Issues
 
 - **`Cmd+\` may not work on macOS with Chinese IME active**
   The Chinese input method intercepts the `\` key at the OS level (converting it to `、`), preventing the shortcut from reaching VS Code.
-  Workarounds (pick one):
-  1. Use the alternate shortcut `Cmd+Alt+N`.
-  2. Add `"keyboard.dispatch": "keyCode"` to your VS Code settings and restart.
-     The extension will automatically detect and suggest this setting on first activation.
+  Workaround: use the alternate shortcut `Cmd+Alt+N`. The extension will automatically prompt this on first activation.
 - `Cmd+\` / `Ctrl+\` may conflict with the editor's split-view shortcut in some keymaps.
   Workaround: use `Cmd+Alt+N` / `Ctrl+Alt+N`, or rebind the shortcut.
 - If candidates are not updated after code changes, run:

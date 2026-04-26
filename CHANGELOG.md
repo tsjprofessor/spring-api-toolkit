@@ -2,10 +2,16 @@
 
 本文档记录本项目的主要版本变更。
 
+## [0.0.4] - 2026-04-26
+
+### 优化
+- 移除 `keyboard.dispatch: keyCode` 自动修复方案（该设置会导致 `Cmd+Alt+N` 等其他快捷键失效）。
+- IME 提示简化为仅建议使用备用快捷键 `Cmd+Alt+N`。
+
 ## [0.0.3] - 2026-04-26
 
 ### 新增
-- macOS 中文环境下首次激活时，自动检测并提示 `keyboard.dispatch` 设置，解决中文输入法导致 `Cmd+\` 失效的问题。
+- macOS 中文环境下首次激活时，自动提示中文输入法可能导致 `Cmd+\` 失效。
 - 新增英文版 README（`README.en.md`）和 CHANGELOG（`CHANGELOG.en.md`）。
 
 ### 优化

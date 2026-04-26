@@ -2,10 +2,16 @@
 
 This document records the major version changes of this project.
 
+## [0.0.4] - 2026-04-26
+
+### Improved
+- Removed `keyboard.dispatch: keyCode` auto-fix (it caused `Cmd+Alt+N` and other shortcuts to break).
+- Simplified IME notification to only suggest using the alternate shortcut `Cmd+Alt+N`.
+
 ## [0.0.3] - 2026-04-26
 
 ### Added
-- Auto-detect and prompt `keyboard.dispatch` setting on first activation for macOS Chinese locale users, fixing `Cmd+\` not working with Chinese IME.
+- Auto-prompt on first activation for macOS Chinese locale users when `Cmd+\` may not work with Chinese IME.
 - Added English README (`README.en.md`) and CHANGELOG (`CHANGELOG.en.md`).
 
 ### Improved

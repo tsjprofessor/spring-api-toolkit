@@ -4,6 +4,22 @@ import { HttpMethod, Endpoint, composeFullPath } from '../../indexer/endpoint-mo
 import { ParseError } from '../../infra/errors';
 import { logger } from '../../infra/logger';
 
+/**
+ * 将代码中的注释替换为空格
+ * 这样可以保持行号和字符位置不变，同时避免正则表达式匹配到注释中的内容
+ */
+function replaceCommentsWithSpaces(text: string): string {
+  // 替换多行注释为等长的空格
+  let result = text.replace(/\/\*[\s\S]*?\*\//g, (match) => {
+    return ' '.repeat(match.length);
+  });
+  // 替换单行注释为等长的空格
+  result = result.replace(/\/\/.*$/gm, (match) => {
+    return ' '.repeat(match.length);
+  });
+  return result;
+}
+
 const HTTP_METHOD_MAPPINGS: Record<string, HttpMethod> = {
   'RequestMapping': 'GET',
   'GetMapping': 'GET',
@@ -91,6 +107,7 @@ export function parseSpringMappings(
 ): Endpoint[] {
   const endpoints: Endpoint[] = [];
   const text = document.getText();
+  const textWithoutComments = replaceCommentsWithSpaces(text);
   const lines = text.split('\n');
 
   // 查找类级注解
@@ -98,20 +115,20 @@ export function parseSpringMappings(
   let className = '';
   let classLine = 0;
 
-  // 匹配类声明和类级注解
-  const classAnnotationMatch = text.match(/@(?:RequestMapping|RestController)\s*\(([\s\S]*?)\)\s*(?:public\s+)?class\s+(\w+)/);
+  // 匹配类声明和类级注解（使用无注释文本避免匹配到注释中的内容）
+  const classAnnotationMatch = textWithoutComments.match(/@(?:RequestMapping|RestController)\s*\(([\s\S]*?)\)\s*(?:public\s+)?class\s+(\w+)/);
   if (classAnnotationMatch) {
     classPath = extractPathFromAnnotation(classAnnotationMatch[1]);
     className = classAnnotationMatch[2];
-    const classIndex = text.indexOf(`class ${className}`);
-    classLine = text.substring(0, classIndex).split('\n').length - 1;
+    const classIndex = textWithoutComments.indexOf(`class ${className}`);
+    classLine = textWithoutComments.substring(0, classIndex).split('\n').length - 1;
   } else {
     // 查找类名（无类级注解）
-    const classMatch = text.match(/(?:public\s+)?class\s+(\w+)/);
+    const classMatch = textWithoutComments.match(/(?:public\s+)?class\s+(\w+)/);
     if (classMatch) {
       className = classMatch[1];
-      const classIndex = text.indexOf(`class ${className}`);
-      classLine = text.substring(0, classIndex).split('\n').length - 1;
+      const classIndex = textWithoutComments.indexOf(`class ${className}`);
+      classLine = textWithoutComments.substring(0, classIndex).split('\n').length - 1;
     }
   }
 
@@ -119,15 +136,18 @@ export function parseSpringMappings(
     return endpoints;
   }
 
-  // 查找所有方法级注解
+  // 重置全局正则表达式的 lastIndex，避免状态问题
+  ANNOTATION_PATTERN.lastIndex = 0;
+
+  // 查找所有方法级注解（使用无注释文本避免匹配到注释中的内容）
   let match: RegExpExecArray | null;
-  while ((match = ANNOTATION_PATTERN.exec(text)) !== null) {
+  while ((match = ANNOTATION_PATTERN.exec(textWithoutComments)) !== null) {
     const annotationName = match[1];
     const annotationArgs = match[2];
     const annotationStart = match.index;
 
-    // 查找注解所属的方法
-    const afterAnnotation = text.substring(annotationStart);
+    // 查找注解所属的方法（使用无注释文本，但位置索引保持一致）
+    const afterAnnotation = textWithoutComments.substring(annotationStart);
     const methodMatch = afterAnnotation.match(/(?:public|private|protected)?\s*(?:\w+(?:<[^>]+>)?)\s+(\w+)\s*\(/);
 
     if (methodMatch) {
@@ -145,7 +165,7 @@ export function parseSpringMappings(
 
       const fullPath = composeFullPath(classPath, methodPath);
 
-      // 计算方法在文件中的位置
+      // 计算方法在文件中的位置（由于注释被替换为空格，位置索引保持一致）
       const methodStartInFile = text.indexOf(methodMatch[0], annotationStart);
       const methodStartLine = text.substring(0, methodStartInFile).split('\n').length - 1;
       const methodEndLine = findMethodEndLine(lines, methodStartLine);

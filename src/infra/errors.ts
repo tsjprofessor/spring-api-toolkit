@@ -1,6 +1,6 @@
 export class ParseError extends Error {
   constructor(message: string, public readonly filePath: string, public readonly cause?: Error) {
-    super(message);
+    super(message, cause ? { cause } : undefined);
     this.name = 'ParseError';
   }
 }
@@ -20,13 +20,13 @@ export class NavigateError extends Error {
 }
 
 export function isParseError(error: unknown): error is ParseError {
-  return error instanceof Error && error.name === 'ParseError';
+  return error instanceof ParseError;
 }
 
 export function isMatchError(error: unknown): error is MatchError {
-  return error instanceof Error && error.name === 'MatchError';
+  return error instanceof MatchError;
 }
 
 export function isNavigateError(error: unknown): error is NavigateError {
-  return error instanceof Error && error.name === 'NavigateError';
+  return error instanceof NavigateError;
 }

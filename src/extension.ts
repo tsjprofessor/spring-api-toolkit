@@ -47,10 +47,53 @@ export function activate(context: vscode.ExtensionContext): void {
     fileWatcher
   );
 
+  // macOS + 中文环境：提示 keyboard.dispatch 设置
+  showImeKeybindingHint(context);
+
   // 预热索引（后台执行）
   getEndpointIndexer().getIndex().catch(err => {
     console.error('Failed to build initial index:', err);
   });
+}
+
+const IME_HINT_DISMISSED_KEY = 'restToolkit.imeHintDismissed';
+
+function showImeKeybindingHint(context: vscode.ExtensionContext): void {
+  if (process.platform !== 'darwin') {
+    return;
+  }
+  if (!vscode.env.language.startsWith('zh')) {
+    return;
+  }
+  if (context.globalState.get<boolean>(IME_HINT_DISMISSED_KEY)) {
+    return;
+  }
+  const dispatch = vscode.workspace
+    .getConfiguration('keyboard')
+    .get<string>('dispatch');
+  if (dispatch === 'keyCode') {
+    return;
+  }
+
+  const applyFix = '应用修复';
+  const dismiss = '不再提示';
+
+  vscode.window
+    .showInformationMessage(
+      '中文输入法下 Cmd+\\ 可能失效，建议将 keyboard.dispatch 设置为 keyCode，或使用备用快捷键 Cmd+Alt+N。',
+      applyFix,
+      dismiss
+    )
+    .then((choice) => {
+      if (choice === applyFix) {
+        vscode.workspace
+          .getConfiguration('keyboard')
+          .update('dispatch', 'keyCode', vscode.ConfigurationTarget.Global);
+        context.globalState.update(IME_HINT_DISMISSED_KEY, true);
+      } else if (choice === dismiss) {
+        context.globalState.update(IME_HINT_DISMISSED_KEY, true);
+      }
+    });
 }
 
 export function deactivate(): void {

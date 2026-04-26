@@ -7,7 +7,7 @@
 
 ## 1. 产品目标
 
-在 Qoder/VSCode 中提供一个最小但可用的能力：
+在 VSCode 中提供一个最小但可用的能力：
 1. 用户输入 URL 路径（如 `/user/add`）后，能直接跳转到对应 Controller 方法（如 `UserController.add`）。
 
 本期只做 URL 搜索跳转主能力，其他能力全部延期。

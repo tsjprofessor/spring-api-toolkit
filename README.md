@@ -1,6 +1,6 @@
 # Spring API Toolkit
 
-一个用于 VSCode/Qoder 的 Spring MVC URL 跳转插件，可通过 URL 直接定位到接口方法定义。
+一个用于 VSCode 的 Spring MVC URL 跳转插件，可通过 URL 直接定位到接口方法定义。
 
 ## 项目现状（已完成）
 
@@ -59,7 +59,7 @@
 npx @vscode/vsce package
 ```
 
-2. 在 VSCode/Qoder 中执行：
+2. 在 VSCode 中执行：
 - `Extensions: Install from VSIX...`
 
 3. 选择生成的 `.vsix` 文件安装。
@@ -102,6 +102,12 @@ npm run build
 
 ## 已知问题
 
+- **macOS 中文输入法下 `Cmd+\` 可能失效**  
+  原因：中文输入法会在系统层面拦截 `\` 键（转为顿号 `、`），导致快捷键无法触发。  
+  解决方式（任选其一）：
+  1. 使用备用快捷键 `Cmd+Alt+N`。
+  2. 在 VS Code 设置中添加 `"keyboard.dispatch": "keyCode"`，重启后生效。  
+     插件首次激活时会自动检测并提示此设置。
 - `Cmd+\` / `Ctrl+\` 在部分键位方案下可能与编辑器分屏快捷键冲突。  
   处理方式：改用 `Cmd+Alt+N` / `Ctrl+Alt+N`，或自行重绑快捷键。
 - 代码变更后如果候选结果未更新，可执行：

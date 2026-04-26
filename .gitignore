@@ -2,7 +2,7 @@ out/
 node_modules/
 .vscode-test/
 *.vsix
-docs/
+docs/superpowers/
 .vscode/
 .claude/
 

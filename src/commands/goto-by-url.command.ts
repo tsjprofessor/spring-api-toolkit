@@ -3,7 +3,7 @@ import * as vscode from 'vscode';
 import { getEndpointIndexer } from '../indexer/endpoint-indexer';
 import { matchByUrl } from '../matcher/url-matcher';
 import { navigateToEndpoint } from '../navigation/method-navigator';
-import { showEndpointQuickPick } from '../ui/endpoint-quick-pick';
+import { showEndpointQuickPick, showLiveEndpointSearchQuickPick } from '../ui/endpoint-quick-pick';
 import { logger } from '../infra/logger';
 
 /**
@@ -13,24 +13,25 @@ export async function executeGoToByUrlCommand(directInput?: string): Promise<voi
   const startTime = Date.now();
 
   try {
-    // 1. 获取用户输入
-    const input = directInput ?? await vscode.window.showInputBox({
-      placeHolder: 'GET /api/users/1 or /api/users/1',
-      prompt: 'Input URL (or METHOD + URL) to navigate to endpoint'
-    });
+    // 1. 获取索引
+    const indexer = getEndpointIndexer();
+    const index = await indexer.getIndex();
+    const contextPath = vscode.workspace.getConfiguration('restToolkit').get<string>('contextPath', '');
 
-    if (!input) {
+    // 2. 无 directInput 时，使用实时搜索面板（边输入边搜索）
+    if (!directInput) {
+      const selected = await showLiveEndpointSearchQuickPick(index.endpoints, contextPath);
+      if (!selected) {
+        return;
+      }
+      await navigateToEndpoint(selected);
       return;
     }
 
+    // 3. directInput 场景：按输入值执行一次匹配并跳转
+    const input = directInput;
     logger.info('command', 'GoToByUrl triggered', { inputUrl: input });
 
-    // 2. 获取索引
-    const indexer = getEndpointIndexer();
-    const index = await indexer.getIndex();
-
-    // 3. 匹配
-    const contextPath = vscode.workspace.getConfiguration('restToolkit').get<string>('contextPath', '');
     const matchResult = matchByUrl(index.endpoints, input, contextPath);
 
     // 4. 处理匹配结果

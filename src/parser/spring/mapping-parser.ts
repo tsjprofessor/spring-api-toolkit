@@ -110,30 +110,34 @@ export function parseSpringMappings(
   const textWithoutComments = replaceCommentsWithSpaces(text);
   const lines = text.split('\n');
 
-  // 查找类级注解
+  // 查找类信息与类级注解
   let classPath = '';
   let className = '';
   let classLine = 0;
+  let classDeclarationIndex = -1;
 
-  // 匹配类声明和类级注解（使用无注释文本避免匹配到注释中的内容）
-  const classAnnotationMatch = textWithoutComments.match(/@(?:RequestMapping|RestController)\s*\(([\s\S]*?)\)\s*(?:public\s+)?class\s+(\w+)/);
-  if (classAnnotationMatch) {
-    classPath = extractPathFromAnnotation(classAnnotationMatch[1]);
-    className = classAnnotationMatch[2];
-    const classIndex = textWithoutComments.indexOf(`class ${className}`);
-    classLine = textWithoutComments.substring(0, classIndex).split('\n').length - 1;
-  } else {
-    // 查找类名（无类级注解）
-    const classMatch = textWithoutComments.match(/(?:public\s+)?class\s+(\w+)/);
-    if (classMatch) {
-      className = classMatch[1];
-      const classIndex = textWithoutComments.indexOf(`class ${className}`);
-      classLine = textWithoutComments.substring(0, classIndex).split('\n').length - 1;
-    }
+  // 先查找类声明
+  const classMatch = textWithoutComments.match(/(?:public\s+)?(?:final\s+)?class\s+(\w+)/);
+  if (classMatch) {
+    className = classMatch[1];
+    classDeclarationIndex = textWithoutComments.indexOf(`class ${className}`);
+    classLine = textWithoutComments.substring(0, classDeclarationIndex).split('\n').length - 1;
   }
 
   if (!className) {
     return endpoints;
+  }
+
+  // 再从类声明之前的注解中提取类级 @RequestMapping 路径
+  const classPrefix = textWithoutComments.substring(0, classDeclarationIndex);
+  ANNOTATION_PATTERN.lastIndex = 0;
+  let classLevelMatch: RegExpExecArray | null;
+  while ((classLevelMatch = ANNOTATION_PATTERN.exec(classPrefix)) !== null) {
+    const annotationName = classLevelMatch[1];
+    const annotationArgs = classLevelMatch[2];
+    if (annotationName === 'RequestMapping') {
+      classPath = extractPathFromAnnotation(annotationArgs);
+    }
   }
 
   // 重置全局正则表达式的 lastIndex，避免状态问题
@@ -145,6 +149,11 @@ export function parseSpringMappings(
     const annotationName = match[1];
     const annotationArgs = match[2];
     const annotationStart = match.index;
+
+    // 跳过类声明之前的注解（例如类级 @RequestMapping）
+    if (annotationStart < classDeclarationIndex) {
+      continue;
+    }
 
     // 查找注解所属的方法（使用无注释文本，但位置索引保持一致）
     const afterAnnotation = textWithoutComments.substring(annotationStart);

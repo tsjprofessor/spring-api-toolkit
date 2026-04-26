@@ -23,36 +23,48 @@ export function parseUserInput(input: string): { path: string; method: HttpMetho
 
 /**
  * 匹配排序规则：
- * 1. 规范化后精确匹配优先
- * 2. 前缀匹配优先于包含匹配
- * 3. 路径长度更短优先
- * 4. Controller#method 字典序稳定排序
+ * 1. 完整路径精确匹配优先
+ * 2. 规范化后精确匹配优先（无前导斜杠对比）
+ * 3. 前缀匹配优先于包含匹配
+ * 4. 路径长度更短优先
+ * 5. Controller#method 字典序稳定排序
  */
-function compareEndpoints(a: Endpoint, b: Endpoint, normalizedInput: string): number {
+function compareEndpoints(a: Endpoint, b: Endpoint, normalizedInput: string, fuzzyInput: string): number {
   const normalizedA = normalizePath(a.fullPath);
   const normalizedB = normalizePath(b.fullPath);
+  const fuzzyA = normalizedA.replace(/^\//, '');
+  const fuzzyB = normalizedB.replace(/^\//, '');
 
-  // 1. 规范化后精确匹配优先
+  // 1. 完整路径精确匹配优先
   const exactA = normalizedA === normalizedInput ? 1 : 0;
   const exactB = normalizedB === normalizedInput ? 1 : 0;
   if (exactA !== exactB) return exactB - exactA;
 
-  // 2. 前缀匹配优先于包含匹配
-  const prefixA = normalizedInput.startsWith(normalizedA) ? 1 : 0;
-  const prefixB = normalizedInput.startsWith(normalizedB) ? 1 : 0;
-  const containsA = normalizedA.includes(normalizedInput) ? 1 : 0;
-  const containsB = normalizedB.includes(normalizedInput) ? 1 : 0;
+  // 2. 规范化后精确匹配优先（无前导斜杠）
+  const fuzzyExactA = fuzzyInput.length > 0 && fuzzyA === fuzzyInput ? 1 : 0;
+  const fuzzyExactB = fuzzyInput.length > 0 && fuzzyB === fuzzyInput ? 1 : 0;
+  if (fuzzyExactA !== fuzzyExactB) return fuzzyExactB - fuzzyExactA;
+
+  // 3. 前缀匹配优先于包含匹配
+  const prefixA = normalizedA.startsWith(normalizedInput) ? 1 : 0;
+  const prefixB = normalizedB.startsWith(normalizedInput) ? 1 : 0;
+  const containsA =
+    normalizedA.includes(normalizedInput) ||
+    (fuzzyInput.length > 0 && fuzzyA.includes(fuzzyInput)) ? 1 : 0;
+  const containsB =
+    normalizedB.includes(normalizedInput) ||
+    (fuzzyInput.length > 0 && fuzzyB.includes(fuzzyInput)) ? 1 : 0;
 
   const scoreA = prefixA * 2 + containsA;
   const scoreB = prefixB * 2 + containsB;
   if (scoreA !== scoreB) return scoreB - scoreA;
 
-  // 3. 路径长度更短优先
+  // 4. 路径长度更短优先
   if (a.fullPath.length !== b.fullPath.length) {
     return a.fullPath.length - b.fullPath.length;
   }
 
-  // 4. Controller#method 字典序稳定排序
+  // 5. Controller#method 字典序稳定排序
   const keyA = `${a.className}#${a.methodName}`;
   const keyB = `${b.className}#${b.methodName}`;
   return keyA.localeCompare(keyB);
@@ -76,6 +88,7 @@ export function matchByUrl(
   }
 
   normalizedPath = normalizePath(normalizedPath);
+  const fuzzyInput = normalizedPath.replace(/^\//, '');
 
   // 筛选匹配的 endpoint
   let candidates = endpoints.filter(endpoint => {
@@ -85,14 +98,16 @@ export function matchByUrl(
     }
 
     const normalizedEndpointPath = normalizePath(endpoint.fullPath);
+    const fuzzyEndpointPath = normalizedEndpointPath.replace(/^\//, '');
     // 精确匹配或包含匹配
     return normalizedEndpointPath === normalizedPath ||
            normalizedPath.includes(normalizedEndpointPath) ||
-           normalizedEndpointPath.includes(normalizedPath);
+           normalizedEndpointPath.includes(normalizedPath) ||
+           (fuzzyInput.length > 0 && fuzzyEndpointPath.includes(fuzzyInput));
   });
 
   // 排序
-  candidates.sort((a, b) => compareEndpoints(a, b, normalizedPath));
+  candidates.sort((a, b) => compareEndpoints(a, b, normalizedPath, fuzzyInput));
 
   // 尝试精确匹配
   const exactMatches = candidates.filter(c =>

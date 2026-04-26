@@ -29,7 +29,7 @@ export function activate(context: vscode.ExtensionContext): void {
       indexer.invalidate();
       await indexer.getIndex();
       provider.refresh();
-      vscode.window.showInformationMessage('REST Toolkit index refreshed');
+      vscode.window.showInformationMessage('Spring URL Jump index refreshed');
     }
   );
 

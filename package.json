@@ -1,10 +1,28 @@
 {
-  "name": "qoder-restful-toolkit",
-  "displayName": "Qoder RESTful Toolkit",
-  "description": "A toolkit for RESTful services development in VSCode/Qoder.",
+  "name": "spring-url-jump",
+  "displayName": "Spring URL Jump",
+  "description": "Jump to Spring MVC endpoint methods by URL in VSCode/Qoder.",
   "version": "0.0.1",
-  "publisher": "local",
+  "publisher": "your-publisher-id",
   "license": "MIT",
+  "icon": "media/icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/spring-url-jump.git"
+  },
+  "homepage": "https://github.com/your-org/spring-url-jump",
+  "bugs": {
+    "url": "https://github.com/your-org/spring-url-jump/issues"
+  },
+  "keywords": [
+    "spring",
+    "spring-mvc",
+    "url",
+    "endpoint",
+    "navigation",
+    "java",
+    "kotlin"
+  ],
   "engines": {
     "vscode": "^1.90.0"
   },
@@ -12,6 +30,7 @@
     "Other"
   ],
   "activationEvents": [
+    "onStartupFinished",
     "onCommand:restToolkit.gotoByUrl",
     "onCommand:restToolkit.refreshServices",
     "onView:restToolkit.services"
@@ -21,41 +40,39 @@
     "commands": [
       {
         "command": "restToolkit.gotoByUrl",
-        "title": "REST Toolkit: Go To Endpoint By URL"
+        "title": "Spring URL Jump: Go To Endpoint By URL"
       },
       {
         "command": "restToolkit.refreshServices",
-        "title": "REST Toolkit: Refresh Services"
+        "title": "Spring URL Jump: Refresh Index"
       },
       {
         "command": "restToolkit.copyUrl",
-        "title": "REST Toolkit: Generate & Copy URL"
+        "title": "Spring URL Jump: Generate & Copy URL"
       },
       {
         "command": "restToolkit.copyQueryParams",
-        "title": "REST Toolkit: Generate & Copy Query Params"
+        "title": "Spring URL Jump: Generate & Copy Query Params"
       },
       {
         "command": "restToolkit.copyCurl",
-        "title": "REST Toolkit: Copy as cURL"
+        "title": "Spring URL Jump: Copy as cURL"
       },
       {
         "command": "restToolkit.formatJson",
-        "title": "REST Toolkit: Format JSON"
+        "title": "Spring URL Jump: Format JSON"
       }
     ],
     "keybindings": [
       {
         "command": "restToolkit.gotoByUrl",
         "key": "ctrl+\\",
-        "mac": "cmd+\\",
-        "when": "editorTextFocus"
+        "mac": "cmd+\\"
       },
       {
         "command": "restToolkit.gotoByUrl",
         "key": "ctrl+alt+n",
-        "mac": "cmd+alt+n",
-        "when": "editorTextFocus"
+        "mac": "cmd+alt+n"
       },
       {
         "command": "restToolkit.formatJson",
@@ -68,7 +85,7 @@
       "activitybar": [
         {
           "id": "restToolkit",
-          "title": "REST Toolkit",
+          "title": "Spring URL Jump",
           "icon": "media/rest.svg"
         }
       ]
@@ -82,7 +99,7 @@
       ]
     },
     "configuration": {
-      "title": "REST Toolkit",
+      "title": "Spring URL Jump",
       "properties": {
         "restToolkit.ignoreGlobs": {
           "type": "array",

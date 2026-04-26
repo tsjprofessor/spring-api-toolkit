@@ -1,18 +1,18 @@
 {
-  "name": "spring-url-jump",
-  "displayName": "Spring URL Jump",
+  "name": "spring-api-toolkit",
+  "displayName": "Spring API Toolkit",
   "description": "Jump to Spring MVC endpoint methods by URL in VSCode/Qoder.",
   "version": "0.0.1",
-  "publisher": "your-publisher-id",
+  "publisher": "tsjprofessor",
   "license": "MIT",
   "icon": "media/icon.png",
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-org/spring-url-jump.git"
+    "url": "https://github.com/tsjprofessor/spring-api-toolkit.git"
   },
-  "homepage": "https://github.com/your-org/spring-url-jump",
+  "homepage": "https://github.com/tsjprofessor/spring-api-toolkit",
   "bugs": {
-    "url": "https://github.com/your-org/spring-url-jump/issues"
+    "url": "https://github.com/tsjprofessor/spring-api-toolkit/issues"
   },
   "keywords": [
     "spring",
@@ -32,35 +32,18 @@
   "activationEvents": [
     "onStartupFinished",
     "onCommand:restToolkit.gotoByUrl",
-    "onCommand:restToolkit.refreshServices",
-    "onView:restToolkit.services"
+    "onCommand:restToolkit.refreshServices"
   ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
       {
         "command": "restToolkit.gotoByUrl",
-        "title": "Spring URL Jump: Go To Endpoint By URL"
+        "title": "Spring API Toolkit: Go To Endpoint By URL"
       },
       {
         "command": "restToolkit.refreshServices",
-        "title": "Spring URL Jump: Refresh Index"
-      },
-      {
-        "command": "restToolkit.copyUrl",
-        "title": "Spring URL Jump: Generate & Copy URL"
-      },
-      {
-        "command": "restToolkit.copyQueryParams",
-        "title": "Spring URL Jump: Generate & Copy Query Params"
-      },
-      {
-        "command": "restToolkit.copyCurl",
-        "title": "Spring URL Jump: Copy as cURL"
-      },
-      {
-        "command": "restToolkit.formatJson",
-        "title": "Spring URL Jump: Format JSON"
+        "title": "Spring API Toolkit: Refresh Index"
       }
     ],
     "keybindings": [
@@ -73,19 +56,13 @@
         "command": "restToolkit.gotoByUrl",
         "key": "ctrl+alt+n",
         "mac": "cmd+alt+n"
-      },
-      {
-        "command": "restToolkit.formatJson",
-        "key": "ctrl+enter",
-        "mac": "cmd+enter",
-        "when": "editorTextFocus"
       }
     ],
     "viewsContainers": {
       "activitybar": [
         {
           "id": "restToolkit",
-          "title": "Spring URL Jump",
+          "title": "Spring API Toolkit",
           "icon": "media/rest.svg"
         }
       ]
@@ -99,7 +76,7 @@
       ]
     },
     "configuration": {
-      "title": "Spring URL Jump",
+      "title": "Spring API Toolkit",
       "properties": {
         "restToolkit.ignoreGlobs": {
           "type": "array",
@@ -110,11 +87,6 @@
             "**/node_modules/**"
           ],
           "description": "Glob patterns excluded from endpoint scanning."
-        },
-        "restToolkit.defaultBaseUrl": {
-          "type": "string",
-          "default": "http://localhost:8080",
-          "description": "Default base URL used by copy and request tools."
         },
         "restToolkit.contextPath": {
           "type": "string",

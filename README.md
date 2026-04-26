@@ -1,6 +1,39 @@
-# Spring URL Jump
+# Spring API Toolkit
 
 一个用于 VSCode/Qoder 的 Spring MVC URL 跳转插件，可通过 URL 直接定位到接口方法定义。
+
+## 项目现状（已完成）
+
+**Spring API Toolkit** 当前已完成 `0.0.1` 的核心能力交付，定位是一个面向 Spring MVC 的 URL 反查与代码跳转工具。
+
+### 我们已经完成了什么
+
+1. **URL 直达方法定义**
+- 支持输入 `/path` 或 `METHOD /path`
+- 可直接跳转到对应 Controller 方法
+
+2. **实时搜索交互**
+- 打开命令后可边输入边搜索
+- 无需先回车再展示候选结果
+
+3. **多命中选择机制**
+- 当同一路径存在多个候选时，支持列表选择后跳转
+- 使用稳定排序规则保证结果可预期
+
+4. **路径标准化匹配**
+- 支持 `context-path` 前缀处理
+- 支持尾斜杠、重复斜杠归一化
+- 支持大小写不敏感匹配
+- 支持关键词模糊匹配（如 `robot` 命中 `/group-robot/add`）
+
+5. **索引与刷新能力**
+- 扫描 Spring MVC 注解生成接口索引
+- 支持手动刷新索引
+- 文件保存后自动触发索引失效重建
+
+6. **可发布工程化基础**
+- 插件元信息、图标、README、CHANGELOG 已补齐
+- 命令、快捷键、日志输出通道已统一为 `Spring API Toolkit`
 
 ## 功能特性
 
@@ -50,7 +83,7 @@ npm run build
 ## 使用方法
 
 1. 执行命令：
-- `Spring URL Jump: Go To Endpoint By URL`
+- `Spring API Toolkit: Go To Endpoint By URL`
 
 2. 在弹出的输入框中输入 URL，实时查看候选结果。
 
@@ -72,7 +105,7 @@ npm run build
 - `Cmd+\` / `Ctrl+\` 在部分键位方案下可能与编辑器分屏快捷键冲突。  
   处理方式：改用 `Cmd+Alt+N` / `Ctrl+Alt+N`，或自行重绑快捷键。
 - 代码变更后如果候选结果未更新，可执行：
-  - `Spring URL Jump: Refresh Index`
+  - `Spring API Toolkit: Refresh Index`
 
 ## 更新记录
 

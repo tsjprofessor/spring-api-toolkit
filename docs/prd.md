@@ -1,4 +1,4 @@
-# Qoder RESTful Toolkit 插件 PRD（极简 MVP）
+# Spring API Toolkit 插件 PRD（极简 MVP）
 
 - 文档版本：v0.1.0
 - 文档日期：2026-04-26
@@ -23,7 +23,7 @@
 ### 3.1 本期必做（In Scope）
 
 #### F1. URL 到方法跳转
-1. 提供命令：`REST Toolkit: Go To Endpoint By URL`。
+1. 提供命令：`Spring API Toolkit: Go To Endpoint By URL`。
 2. 输入支持：
 - `/user/add`
 - `POST /user/add`（可选 METHOD 前缀）

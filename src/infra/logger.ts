@@ -4,7 +4,7 @@ let outputChannel: vscode.OutputChannel | undefined;
 
 function getChannel(): vscode.OutputChannel {
   if (!outputChannel) {
-    outputChannel = vscode.window.createOutputChannel('Spring URL Jump');
+    outputChannel = vscode.window.createOutputChannel('Spring API Toolkit');
   }
   return outputChannel;
 }
@@ -24,7 +24,7 @@ function safeStringify(data: Record<string, unknown>): string {
 
 export function initLogger(context: vscode.ExtensionContext): void {
   if (!outputChannel) {
-    outputChannel = vscode.window.createOutputChannel('Spring URL Jump');
+    outputChannel = vscode.window.createOutputChannel('Spring API Toolkit');
   }
   context.subscriptions.push(outputChannel);
 }

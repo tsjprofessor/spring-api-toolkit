@@ -37,8 +37,10 @@ export interface EndpointIndex {
  * 构建完整路径
  */
 export function composeFullPath(classPath: string, methodPath: string): string {
-  const normalizedClassPath = classPath.startsWith('/') ? classPath : '/' + classPath;
-  const normalizedMethodPath = methodPath.startsWith('/') ? methodPath : '/' + methodPath;
+  const safeClassPath = classPath ?? '';
+  const safeMethodPath = methodPath ?? '';
+  const normalizedClassPath = safeClassPath.startsWith('/') ? safeClassPath : '/' + safeClassPath;
+  const normalizedMethodPath = safeMethodPath.startsWith('/') ? safeMethodPath : '/' + safeMethodPath;
 
   // 合并路径，处理重复斜杠
   let composed = (normalizedClassPath + normalizedMethodPath)
@@ -55,6 +57,9 @@ export function composeFullPath(classPath: string, methodPath: string): string {
  * 从完整路径中提取标准化后的路径（用于匹配）
  */
 export function normalizePath(path: string): string {
+  if (!path || typeof path !== 'string') {
+    return '/';
+  }
   let normalized = path.trim();
   // 移除首尾空格
   normalized = normalized.replace(/\/+/g, '/');

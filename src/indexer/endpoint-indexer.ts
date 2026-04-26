@@ -10,14 +10,19 @@ export class EndpointIndexer {
   private index: EndpointIndex | undefined;
   private indexingPromise: Promise<EndpointIndex> | undefined;
 
-  constructor(private readonly workspaceRoot: string) {}
+  constructor() {}
 
   /**
    * 获取或构建索引
    */
   async getIndex(): Promise<EndpointIndex> {
     if (this.index) {
-      return this.index;
+      // 检查版本号，版本不匹配时重新构建
+      if (this.index.version !== INDEX_VERSION) {
+        this.index = undefined;
+      } else {
+        return this.index;
+      }
     }
 
     if (this.indexingPromise) {
@@ -38,6 +43,8 @@ export class EndpointIndexer {
    */
   invalidate(): void {
     this.index = undefined;
+    // 清除正在进行的索引构建，下次调用 getIndex() 会重新构建
+    this.indexingPromise = undefined;
   }
 
   /**
@@ -125,8 +132,7 @@ let indexerInstance: EndpointIndexer | undefined;
 
 export function getEndpointIndexer(): EndpointIndexer {
   if (!indexerInstance) {
-    const workspaceRoot = vscode.workspace.rootPath ?? '';
-    indexerInstance = new EndpointIndexer(workspaceRoot);
+    indexerInstance = new EndpointIndexer();
   }
   return indexerInstance;
 }

@@ -23,27 +23,21 @@ export function parseUserInput(input: string): { path: string; method: HttpMetho
 
 /**
  * 匹配排序规则：
- * 1. 完整路径精确匹配优先
- * 2. 规范化后精确匹配优先
- * 3. 前缀匹配优先于包含匹配
- * 4. 路径长度更短优先
- * 5. Controller#method 字典序稳定排序
+ * 1. 规范化后精确匹配优先
+ * 2. 前缀匹配优先于包含匹配
+ * 3. 路径长度更短优先
+ * 4. Controller#method 字典序稳定排序
  */
 function compareEndpoints(a: Endpoint, b: Endpoint, normalizedInput: string): number {
   const normalizedA = normalizePath(a.fullPath);
   const normalizedB = normalizePath(b.fullPath);
 
-  // 1. 完整路径精确匹配优先
-  const exactA = a.fullPath === normalizedInput ? 1 : 0;
-  const exactB = b.fullPath === normalizedInput ? 1 : 0;
+  // 1. 规范化后精确匹配优先
+  const exactA = normalizedA === normalizedInput ? 1 : 0;
+  const exactB = normalizedB === normalizedInput ? 1 : 0;
   if (exactA !== exactB) return exactB - exactA;
 
-  // 2. 规范化后精确匹配优先
-  const normExactA = normalizedA === normalizedInput ? 1 : 0;
-  const normExactB = normalizedB === normalizedInput ? 1 : 0;
-  if (normExactA !== normExactB) return normExactB - normExactA;
-
-  // 3. 前缀匹配优先于包含匹配
+  // 2. 前缀匹配优先于包含匹配
   const prefixA = normalizedInput.startsWith(normalizedA) ? 1 : 0;
   const prefixB = normalizedInput.startsWith(normalizedB) ? 1 : 0;
   const containsA = normalizedA.includes(normalizedInput) ? 1 : 0;
@@ -53,12 +47,12 @@ function compareEndpoints(a: Endpoint, b: Endpoint, normalizedInput: string): nu
   const scoreB = prefixB * 2 + containsB;
   if (scoreA !== scoreB) return scoreB - scoreA;
 
-  // 4. 路径长度更短优先
+  // 3. 路径长度更短优先
   if (a.fullPath.length !== b.fullPath.length) {
     return a.fullPath.length - b.fullPath.length;
   }
 
-  // 5. Controller#method 字典序稳定排序
+  // 4. Controller#method 字典序稳定排序
   const keyA = `${a.className}#${a.methodName}`;
   const keyB = `${b.className}#${b.methodName}`;
   return keyA.localeCompare(keyB);

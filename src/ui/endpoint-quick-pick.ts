@@ -8,13 +8,6 @@ interface EndpointQuickPickItem extends vscode.QuickPickItem {
 }
 
 /**
- * 格式化 endpoint 为显示文本
- */
-function formatEndpointLabel(endpoint: Endpoint): string {
-  return `${endpoint.fullPath} (${endpoint.className}#${endpoint.methodName})`;
-}
-
-/**
  * 显示多命中选择对话框
  */
 export async function showEndpointQuickPick(

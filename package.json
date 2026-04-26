@@ -1,0 +1,120 @@
+{
+  "name": "qoder-restful-toolkit",
+  "displayName": "Qoder RESTful Toolkit",
+  "description": "A toolkit for RESTful services development in VSCode/Qoder.",
+  "version": "0.0.1",
+  "publisher": "local",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:restToolkit.gotoByUrl",
+    "onCommand:restToolkit.refreshServices",
+    "onView:restToolkit.services"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "restToolkit.gotoByUrl",
+        "title": "REST Toolkit: Go To Endpoint By URL"
+      },
+      {
+        "command": "restToolkit.refreshServices",
+        "title": "REST Toolkit: Refresh Services"
+      },
+      {
+        "command": "restToolkit.copyUrl",
+        "title": "REST Toolkit: Generate & Copy URL"
+      },
+      {
+        "command": "restToolkit.copyQueryParams",
+        "title": "REST Toolkit: Generate & Copy Query Params"
+      },
+      {
+        "command": "restToolkit.copyCurl",
+        "title": "REST Toolkit: Copy as cURL"
+      },
+      {
+        "command": "restToolkit.formatJson",
+        "title": "REST Toolkit: Format JSON"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "restToolkit.gotoByUrl",
+        "key": "ctrl+\\",
+        "mac": "cmd+\\",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "restToolkit.gotoByUrl",
+        "key": "ctrl+alt+n",
+        "mac": "cmd+alt+n",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "restToolkit.formatJson",
+        "key": "ctrl+enter",
+        "mac": "cmd+enter",
+        "when": "editorTextFocus"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "restToolkit",
+          "title": "REST Toolkit",
+          "icon": "media/rest.svg"
+        }
+      ]
+    },
+    "views": {
+      "restToolkit": [
+        {
+          "id": "restToolkit.services",
+          "name": "REST Services"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "REST Toolkit",
+      "properties": {
+        "restToolkit.ignoreGlobs": {
+          "type": "array",
+          "default": [
+            "**/target/**",
+            "**/build/**",
+            "**/.git/**",
+            "**/node_modules/**"
+          ],
+          "description": "Glob patterns excluded from endpoint scanning."
+        },
+        "restToolkit.defaultBaseUrl": {
+          "type": "string",
+          "default": "http://localhost:8080",
+          "description": "Default base URL used by copy and request tools."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "lint": "echo \"lint not configured yet\"",
+    "pretest": "npm run build",
+    "test": "jest"
+  },
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "@types/node": "^20.16.0",
+    "@types/vscode": "^1.90.0",
+    "jest": "^30.3.0",
+    "ts-jest": "^29.4.9",
+    "typescript": "^5.6.3"
+  }
+}

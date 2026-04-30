@@ -2,6 +2,7 @@
 import * as vscode from 'vscode';
 
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'OPTIONS';
+export type EndpointMethod = HttpMethod | 'ANY';
 
 export interface Endpoint {
   /** 模块名（多模块项目时区分） */
@@ -13,7 +14,7 @@ export interface Endpoint {
   /** 方法名 */
   readonly methodName: string;
   /** HTTP 方法 */
-  readonly httpMethod: HttpMethod;
+  readonly httpMethod: EndpointMethod;
   /** 类级路径（如 /user） */
   readonly classPath: string;
   /** 方法级路径（如 /add） */

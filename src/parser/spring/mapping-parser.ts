@@ -1,8 +1,6 @@
 // src/parser/spring/mapping-parser.ts
 import * as vscode from 'vscode';
-import { HttpMethod, Endpoint, composeFullPath } from '../../indexer/endpoint-model';
-import { ParseError } from '../../infra/errors';
-import { logger } from '../../infra/logger';
+import { HttpMethod, Endpoint, composeFullPath, EndpointMethod } from '../../indexer/endpoint-model';
 
 /**
  * 将代码中的注释替换为空格
@@ -21,7 +19,6 @@ function replaceCommentsWithSpaces(text: string): string {
 }
 
 const HTTP_METHOD_MAPPINGS: Record<string, HttpMethod> = {
-  'RequestMapping': 'GET',
   'GetMapping': 'GET',
   'PostMapping': 'POST',
   'PutMapping': 'PUT',
@@ -61,15 +58,18 @@ function extractPathFromAnnotation(annotationArgs: string): string {
 /**
  * 从注解参数中提取 HTTP 方法（仅用于 @RequestMapping）
  */
-function extractMethodFromRequestMapping(annotationArgs: string): HttpMethod | undefined {
-  const methodMatch = annotationArgs.match(/method\s*=\s*(?:RequestMethod\.)?(\w+)/);
-  if (methodMatch) {
-    const method = methodMatch[1].toUpperCase();
-    if (['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'].includes(method)) {
-      return method as HttpMethod;
-    }
+function extractMethodsFromRequestMapping(annotationArgs: string): HttpMethod[] {
+  const methodsBlockMatch = annotationArgs.match(/method\s*=\s*(\{[\s\S]*?\}|[^,)\n]+)/);
+  if (!methodsBlockMatch) {
+    return [];
   }
-  return undefined;
+
+  const block = methodsBlockMatch[1];
+  const methodMatches = block.match(/(?:RequestMethod\.)?(GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS)/gi) ?? [];
+  const methods = methodMatches
+    .map((m) => m.replace(/RequestMethod\./i, '').toUpperCase() as HttpMethod);
+
+  return Array.from(new Set(methods));
 }
 
 /**
@@ -163,15 +163,6 @@ export function parseSpringMappings(
       const methodName = methodMatch[1];
       const methodPath = extractPathFromAnnotation(annotationArgs);
 
-      let httpMethod: HttpMethod;
-      if (annotationName === 'RequestMapping') {
-        const explicitMethod = extractMethodFromRequestMapping(annotationArgs);
-        // 如果未指定 method，RequestMapping 默认匹配所有方法，这里暂用 GET
-        httpMethod = explicitMethod ?? 'GET';
-      } else {
-        httpMethod = HTTP_METHOD_MAPPINGS[annotationName] ?? 'GET';
-      }
-
       const fullPath = composeFullPath(classPath, methodPath);
 
       // 计算方法在文件中的位置（由于注释被替换为空格，位置索引保持一致）
@@ -179,20 +170,32 @@ export function parseSpringMappings(
       const methodStartLine = text.substring(0, methodStartInFile).split('\n').length - 1;
       const methodEndLine = findMethodEndLine(lines, methodStartLine);
 
-      endpoints.push({
-        module,
-        filePath: document.uri.fsPath,
-        className,
-        methodName,
-        httpMethod,
-        classPath,
-        methodPath,
-        fullPath,
-        range: new vscode.Range(
-          new vscode.Position(methodStartLine, 0),
-          new vscode.Position(methodEndLine, lines[methodEndLine]?.length ?? 0)
-        )
-      });
+      const range = new vscode.Range(
+        new vscode.Position(methodStartLine, 0),
+        new vscode.Position(methodEndLine, lines[methodEndLine]?.length ?? 0)
+      );
+
+      let endpointMethods: EndpointMethod[] = [];
+      if (annotationName === 'RequestMapping') {
+        const explicitMethods = extractMethodsFromRequestMapping(annotationArgs);
+        endpointMethods = explicitMethods.length > 0 ? explicitMethods : ['ANY'];
+      } else {
+        endpointMethods = [HTTP_METHOD_MAPPINGS[annotationName] ?? 'GET'];
+      }
+
+      for (const endpointMethod of endpointMethods) {
+        endpoints.push({
+          module,
+          filePath: document.uri.fsPath,
+          className,
+          methodName,
+          httpMethod: endpointMethod,
+          classPath,
+          methodPath,
+          fullPath,
+          range
+        });
+      }
     }
   }
 

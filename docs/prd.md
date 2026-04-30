@@ -43,7 +43,6 @@
 - `@PatchMapping`
 2. 语言支持：
 - Java：本期必做
-- Kotlin：与 Java 同等验收口径
 
 #### F3. URL 标准化处理
 1. 支持 `context-path` 前缀参与匹配。

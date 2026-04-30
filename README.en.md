@@ -11,6 +11,7 @@ A VSCode extension for navigating to Spring MVC endpoint method definitions by U
 1. **URL-to-Method Navigation**
    - Supports input like `/path` or `METHOD /path`
    - Jumps directly to the corresponding Controller method
+   - Treats `@RequestMapping` without explicit `method` as matching any HTTP method
 
 2. **Real-time Search**
    - Results update as you type
@@ -27,13 +28,14 @@ A VSCode extension for navigating to Spring MVC endpoint method definitions by U
    - Keyword fuzzy matching (e.g., `robot` matches `/group-robot/add`)
 
 5. **Index & Refresh**
-   - Scans Spring MVC annotations to build an endpoint index
+   - Scans Spring MVC annotations under `src/main/java` to build an endpoint index
    - Supports manual index refresh
    - Automatically invalidates and rebuilds index on file save
 
 6. **Publishing-Ready**
    - Extension metadata, icon, README, and CHANGELOG are complete
    - Commands, keybindings, and log output channel are unified under `Spring API Toolkit`
+   - No sidebar entry; command palette and keybindings are the only entry points
 
 ## Features
 

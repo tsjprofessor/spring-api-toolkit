@@ -4,7 +4,7 @@ import { Endpoint, EndpointIndex } from './endpoint-model';
 import { parseSpringMappings } from '../parser/spring/mapping-parser';
 import { logger } from '../infra/logger';
 
-const INDEX_VERSION = '1.0.0';
+const INDEX_VERSION = '1.1.0';
 
 export class EndpointIndexer {
   private index: EndpointIndex | undefined;
@@ -85,8 +85,9 @@ export class EndpointIndexer {
       // 检查 src/main/java 是否存在
       await vscode.workspace.fs.stat(javaSrcPath);
     } catch {
-      // 不存在则扫描整个模块
-      return this.scanDirectory(vscode.Uri.file(modulePath), moduleName);
+      // 严格按 PRD 仅扫描 src/main/java，不存在则跳过该模块
+      logger.info('scan', 'Skip module without src/main/java', { modulePath, moduleName });
+      return [];
     }
 
     return this.scanDirectory(javaSrcPath, moduleName);
@@ -105,7 +106,7 @@ export class EndpointIndexer {
     ]);
 
     const files = await vscode.workspace.findFiles(
-      new vscode.RelativePattern(dirUri, '**/*.{java,kt}'),
+      new vscode.RelativePattern(dirUri, '**/*.java'),
       `{${ignoreGlobs.join(',')}}`
     );
 

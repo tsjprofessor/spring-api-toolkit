@@ -20,8 +20,7 @@
     "url",
     "endpoint",
     "navigation",
-    "java",
-    "kotlin"
+    "java"
   ],
   "engines": {
     "vscode": "^1.90.0"
@@ -58,23 +57,6 @@
         "mac": "cmd+alt+n"
       }
     ],
-    "viewsContainers": {
-      "activitybar": [
-        {
-          "id": "restToolkit",
-          "title": "Spring API Toolkit",
-          "icon": "media/rest.svg"
-        }
-      ]
-    },
-    "views": {
-      "restToolkit": [
-        {
-          "id": "restToolkit.services",
-          "name": "REST Services"
-        }
-      ]
-    },
     "configuration": {
       "title": "Spring API Toolkit",
       "properties": {

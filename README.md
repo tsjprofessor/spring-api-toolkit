@@ -11,6 +11,7 @@
 1. **URL 直达方法定义**
 - 支持输入 `/path` 或 `METHOD /path`
 - 可直接跳转到对应 Controller 方法
+- `@RequestMapping` 未声明 method 时按“可匹配任意 METHOD”处理
 
 2. **实时搜索交互**
 - 打开命令后可边输入边搜索
@@ -27,13 +28,14 @@
 - 支持关键词模糊匹配（如 `robot` 命中 `/group-robot/add`）
 
 5. **索引与刷新能力**
-- 扫描 Spring MVC 注解生成接口索引
+- 仅扫描 `src/main/java` 下的 Spring MVC 注解生成接口索引
 - 支持手动刷新索引
 - 文件保存后自动触发索引失效重建
 
 6. **可发布工程化基础**
 - 插件元信息、图标、README、CHANGELOG 已补齐
 - 命令、快捷键、日志输出通道已统一为 `Spring API Toolkit`
+- 插件不提供侧边栏入口，仅通过命令/快捷键使用
 
 ## 功能特性
 

@@ -93,7 +93,7 @@ export function matchByUrl(
   // 筛选匹配的 endpoint
   let candidates = endpoints.filter(endpoint => {
     // 如果用户指定了方法，必须匹配
-    if (method && endpoint.httpMethod !== method) {
+    if (method && endpoint.httpMethod !== 'ANY' && endpoint.httpMethod !== method) {
       return false;
     }
 
@@ -113,6 +113,25 @@ export function matchByUrl(
   const exactMatches = candidates.filter(c =>
     normalizePath(c.fullPath) === normalizedPath
   );
+
+  // 用户显式指定 METHOD 时，优先返回该 METHOD 的命中
+  if (method) {
+    const exactMethodMatches = exactMatches.filter(e => e.httpMethod === method);
+    if (exactMethodMatches.length === 1) {
+      return uniqueMatch(exactMethodMatches[0]);
+    }
+    if (exactMethodMatches.length > 1) {
+      return multipleMatch(exactMethodMatches);
+    }
+
+    const candidateMethodMatches = candidates.filter(e => e.httpMethod === method);
+    if (candidateMethodMatches.length === 1) {
+      return uniqueMatch(candidateMethodMatches[0]);
+    }
+    if (candidateMethodMatches.length > 1) {
+      return multipleMatch(candidateMethodMatches);
+    }
+  }
 
   if (exactMatches.length === 1) {
     logger.info('match', 'Unique match found', {

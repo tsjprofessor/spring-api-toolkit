@@ -1,5 +1,5 @@
 // src/parser/spring/mapping-parser.ts
-import * as vscode from 'vscode';
+import { Range, Position } from 'vscode';
 import { HttpMethod, Endpoint, composeFullPath, EndpointMethod } from '../../indexer/endpoint-model';
 
 /**
@@ -102,11 +102,11 @@ function findMethodEndLine(lines: string[], startLine: number): number {
  * 解析文件中的 Spring Controller 信息
  */
 export function parseSpringMappings(
-  document: vscode.TextDocument,
+  text: string,
+  filePath: string,
   module: string
 ): Endpoint[] {
   const endpoints: Endpoint[] = [];
-  const text = document.getText();
   const textWithoutComments = replaceCommentsWithSpaces(text);
   const lines = text.split('\n');
 
@@ -170,9 +170,9 @@ export function parseSpringMappings(
       const methodStartLine = text.substring(0, methodStartInFile).split('\n').length - 1;
       const methodEndLine = findMethodEndLine(lines, methodStartLine);
 
-      const range = new vscode.Range(
-        new vscode.Position(methodStartLine, 0),
-        new vscode.Position(methodEndLine, lines[methodEndLine]?.length ?? 0)
+      const range = new Range(
+        new Position(methodStartLine, 0),
+        new Position(methodEndLine, lines[methodEndLine]?.length ?? 0)
       );
 
       let endpointMethods: EndpointMethod[] = [];
@@ -186,7 +186,7 @@ export function parseSpringMappings(
       for (const endpointMethod of endpointMethods) {
         endpoints.push({
           module,
-          filePath: document.uri.fsPath,
+          filePath,
           className,
           methodName,
           httpMethod: endpointMethod,

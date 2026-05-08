@@ -28,7 +28,9 @@
 - 支持关键词模糊匹配（如 `robot` 命中 `/group-robot/add`）
 
 5. **索引与刷新能力**
-- 仅扫描 `src/main/java` 下的 Spring MVC 注解生成接口索引
+- 默认扫描 `src/main/java` 下的 Spring MVC 注解生成接口索引
+- 当项目不存在 `src/main/java` 时，自动兜底扫描老项目常见的 `src` 目录
+- 支持通过 `restToolkit.sourceRoots` 配置自定义 Java 源码目录
 - 支持手动刷新索引
 - 文件保存后自动触发索引失效重建
 
@@ -50,6 +52,19 @@
   - 尾斜杠处理
   - 重复斜杠处理
   - 大小写不敏感匹配
+- 支持老 Spring MVC / Eclipse Web 项目的 `src` 源码目录兜底扫描
+
+## 配置项
+
+- `restToolkit.sourceRoots`
+  - 默认值：`["src/main/java"]`
+  - 用途：配置要扫描的 Java 源码目录
+  - 说明：如果默认目录不存在，插件会自动兜底扫描 `src`
+- `restToolkit.contextPath`
+  - 默认值：`""`
+  - 用途：匹配前剥离统一上下文路径前缀，例如 `/api`
+- `restToolkit.ignoreGlobs`
+  - 用途：排除 `target`、`build` 等不参与扫描的目录
 
 ## 安装方式
 
@@ -65,6 +80,11 @@ npx @vscode/vsce package
 - `Extensions: Install from VSIX...`
 
 3. 选择生成的 `.vsix` 文件安装。
+
+4. 安装新版后建议执行：
+- `Developer: Reload Window`
+
+然后再执行搜索命令，确保扩展代码和接口索引都刷新到最新版本。
 
 ### 方式二：开发模式运行
 

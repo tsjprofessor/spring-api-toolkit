@@ -2,7 +2,7 @@
   "name": "spring-api-toolkit",
   "displayName": "Spring API Toolkit",
   "description": "Jump to Spring MVC endpoint methods by URL in VSCode.",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "publisher": "tsjprofessor",
   "license": "MIT",
   "icon": "media/icon.png",
@@ -69,6 +69,13 @@
             "**/node_modules/**"
           ],
           "description": "Glob patterns excluded from endpoint scanning."
+        },
+        "restToolkit.sourceRoots": {
+          "type": "array",
+          "default": [
+            "src/main/java"
+          ],
+          "description": "Java source roots to scan for Spring endpoint mappings. If none exists, the indexer falls back to legacy 'src'."
         },
         "restToolkit.contextPath": {
           "type": "string",

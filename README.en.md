@@ -28,7 +28,9 @@ A VSCode extension for navigating to Spring MVC endpoint method definitions by U
    - Keyword fuzzy matching (e.g., `robot` matches `/group-robot/add`)
 
 5. **Index & Refresh**
-   - Scans Spring MVC annotations under `src/main/java` to build an endpoint index
+   - Scans Spring MVC annotations under `src/main/java` by default to build an endpoint index
+   - Falls back to the legacy `src` directory when `src/main/java` does not exist
+   - Supports custom Java source roots through `restToolkit.sourceRoots`
    - Supports manual index refresh
    - Automatically invalidates and rebuilds index on file save
 
@@ -50,6 +52,19 @@ A VSCode extension for navigating to Spring MVC endpoint method definitions by U
   - Trailing slash handling
   - Duplicate slash handling
   - Case-insensitive matching
+- Legacy Spring MVC / Eclipse Web project support with `src` source-root fallback
+
+## Configuration
+
+- `restToolkit.sourceRoots`
+  - Default: `["src/main/java"]`
+  - Purpose: Java source directories to scan
+  - Note: if the default root does not exist, the extension falls back to `src`
+- `restToolkit.contextPath`
+  - Default: `""`
+  - Purpose: strips a shared context path prefix before matching, e.g. `/api`
+- `restToolkit.ignoreGlobs`
+  - Purpose: excludes directories such as `target` and `build` from scanning
 
 ## Installation
 
@@ -65,6 +80,11 @@ npx @vscode/vsce package
    - `Extensions: Install from VSIX...`
 
 3. Select the generated `.vsix` file to install.
+
+4. After installing a new VSIX, it is recommended to run:
+   - `Developer: Reload Window`
+
+Then run the search command again to ensure the extension code and endpoint index are refreshed.
 
 ### Option 2: Development Mode
 

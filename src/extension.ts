@@ -24,10 +24,14 @@ export function activate(context: vscode.ExtensionContext): void {
     }
   );
 
-  // 文件变更时触发增量索引（简化实现：标记缓存失效）
+  // 文件变更时触发索引失效（500ms 防抖，避免连续保存时频繁重建）
+  let debounceTimer: NodeJS.Timeout | undefined;
   const fileWatcher = vscode.workspace.onDidSaveTextDocument((doc) => {
     if (doc.uri.fsPath.endsWith('.java')) {
-      getEndpointIndexer().invalidate();
+      if (debounceTimer) clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        getEndpointIndexer().invalidate();
+      }, 500);
     }
   });
 

@@ -2,6 +2,15 @@
 
 本文档记录本项目的主要版本变更。
 
+## [0.0.5] - 2026-05-08
+
+### 新增
+- 新增 `restToolkit.sourceRoots` 配置，用于自定义 Spring MVC 注解扫描的 Java 源码目录。
+- 当默认 `src/main/java` 不存在时，自动兜底扫描老 Spring MVC / Eclipse Web 项目常见的 `src` 目录。
+
+### 优化
+- 安装新版 VSIX 后建议执行 `Developer: Reload Window`，确保扩展代码与接口索引刷新到最新版本。
+
 ## [0.0.4] - 2026-04-26
 
 ### 优化

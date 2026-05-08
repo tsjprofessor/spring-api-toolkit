@@ -1,10 +1,13 @@
 // src/indexer/endpoint-indexer.ts
 import * as vscode from 'vscode';
+import * as fs from 'fs';
 import { Endpoint, EndpointIndex } from './endpoint-model';
 import { parseSpringMappings } from '../parser/spring/mapping-parser';
 import { logger } from '../infra/logger';
 
-const INDEX_VERSION = '1.1.0';
+const INDEX_VERSION = '1.2.0';
+const DEFAULT_SOURCE_ROOTS = ['src/main/java'];
+const LEGACY_SOURCE_ROOT = 'src';
 
 export class EndpointIndexer {
   private index: EndpointIndex | undefined;
@@ -79,18 +82,45 @@ export class EndpointIndexer {
    * 扫描单个模块
    */
   private async scanModule(modulePath: string, moduleName: string): Promise<Endpoint[]> {
-    const javaSrcPath = vscode.Uri.file(`${modulePath}/src/main/java`);
+    const configuredSourceRoots = vscode.workspace.getConfiguration('restToolkit').get<string[]>(
+      'sourceRoots',
+      DEFAULT_SOURCE_ROOTS
+    );
+    const sourceRoots = configuredSourceRoots.length > 0 ? configuredSourceRoots : DEFAULT_SOURCE_ROOTS;
 
-    try {
-      // 检查 src/main/java 是否存在
-      await vscode.workspace.fs.stat(javaSrcPath);
-    } catch {
-      // 严格按 PRD 仅扫描 src/main/java，不存在则跳过该模块
-      logger.info('scan', 'Skip module without src/main/java', { modulePath, moduleName });
+    const endpoints: Endpoint[] = [];
+    let scannedExistingSourceRoot = false;
+    for (const sourceRoot of sourceRoots) {
+      const sourceUri = vscode.Uri.file(`${modulePath}/${sourceRoot}`);
+      if (!(await this.sourceRootExists(sourceUri))) {
+        logger.info('scan', 'Skip missing source root', { modulePath, moduleName, sourceRoot });
+        continue;
+      }
+      scannedExistingSourceRoot = true;
+      endpoints.push(...await this.scanDirectory(sourceUri, moduleName));
+    }
+
+    if (scannedExistingSourceRoot || sourceRoots.includes(LEGACY_SOURCE_ROOT)) {
+      return endpoints;
+    }
+
+    const legacySourceUri = vscode.Uri.file(`${modulePath}/${LEGACY_SOURCE_ROOT}`);
+    if (!(await this.sourceRootExists(legacySourceUri))) {
+      logger.info('scan', 'Skip module without Java source roots', { modulePath, moduleName, sourceRoots });
       return [];
     }
 
-    return this.scanDirectory(javaSrcPath, moduleName);
+    logger.info('scan', 'Fallback to legacy source root', { modulePath, moduleName, sourceRoot: LEGACY_SOURCE_ROOT });
+    return this.scanDirectory(legacySourceUri, moduleName);
+  }
+
+  private async sourceRootExists(sourceUri: vscode.Uri): Promise<boolean> {
+    try {
+      await vscode.workspace.fs.stat(sourceUri);
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   /**
@@ -110,17 +140,20 @@ export class EndpointIndexer {
       `{${ignoreGlobs.join(',')}}`
     );
 
-    for (const file of files) {
-      try {
-        const document = await vscode.workspace.openTextDocument(file);
-        const fileEndpoints = parseSpringMappings(document, moduleName);
-        endpoints.push(...fileEndpoints);
-      } catch (error) {
-        logger.warn('scan', `Failed to parse file: ${file.fsPath}`, {
-          error: error instanceof Error ? error.message : String(error)
-        });
-      }
-    }
+    const results = await Promise.all(
+      files.map(async (file) => {
+        try {
+          const text = await fs.promises.readFile(file.fsPath, 'utf-8');
+          return parseSpringMappings(text, file.fsPath, moduleName);
+        } catch (error) {
+          logger.warn('scan', `Failed to parse file: ${file.fsPath}`, {
+            error: error instanceof Error ? error.message : String(error)
+          });
+          return [];
+        }
+      })
+    );
+    endpoints.push(...results.flat());
 
     return endpoints;
   }

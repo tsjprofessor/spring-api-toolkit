@@ -2,6 +2,15 @@
 
 This document records the major version changes of this project.
 
+## [0.0.5] - 2026-05-08
+
+### Added
+- Added `restToolkit.sourceRoots` for customizing Java source directories scanned for Spring MVC annotations.
+- Added automatic fallback to the legacy `src` directory when the default `src/main/java` root does not exist.
+
+### Improved
+- Recommended `Developer: Reload Window` after installing a new VSIX to refresh extension code and endpoint index state.
+
 ## [0.0.4] - 2026-04-26
 
 ### Improved
